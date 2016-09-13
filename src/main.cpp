@@ -1,22 +1,28 @@
-#define VERSION "1"
+#define VERSION "2"
 #include "SarahHome.h"
-#define HEATING_PIN 2
-#define WATER_PIN  0
+#define HEATING_PIN 4
+#define WATER_PIN  5
 SarahHome sarahHome("hvac");
 
 const char* mqttControlTopicFormat = "hvac/%s/%s/control/set";
 char mqttHeatingControlTopic[100];
 char mqttWaterControlTopic[100];
 const char* mqttStatusTopicFormat = "hvac/%s/%s/status";
+char mqttHeatingStatusTopic[100];
+char mqttWaterStatusTopic[100];
 
 //Set heating on/off
 void setHeating(boolean isOn) {
+  Serial.printf("Setting heating: %s\n", isOn ? "on" : "off");
   digitalWrite(HEATING_PIN, !isOn);
+  sarahHome.mqttClient.publish(mqttHeatingStatusTopic, isOn ? "on" : "off", true);
 }
 
 //Set water on/off
 void setWater(boolean isOn) {
+  Serial.printf("Setting water: %s\n", isOn ? "on" : "off");
   digitalWrite(WATER_PIN, !isOn);
+  sarahHome.mqttClient.publish(mqttWaterStatusTopic, isOn ? "on" : "off", true);
 }
 
 //Callback is called on MQTT messages
@@ -30,7 +36,8 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 
   if (isHeating) {
     setHeating(on);
-  } else if (isWater) {
+  }
+  if (isWater) {
     setWater(on);
   }
 }
@@ -46,8 +53,11 @@ void setup()
 
   sarahHome.setup(VERSION);
 
+  //Setup topics and subscriptions
   sprintf(mqttHeatingControlTopic, mqttControlTopicFormat, sarahHome.getNodeId().c_str(), "heating");
   sprintf(mqttWaterControlTopic, mqttControlTopicFormat, sarahHome.getNodeId().c_str(), "water");
+  sprintf(mqttHeatingStatusTopic, mqttStatusTopicFormat, sarahHome.getNodeId().c_str(), "heating");
+  sprintf(mqttWaterStatusTopic, mqttStatusTopicFormat, sarahHome.getNodeId().c_str(), "water");
   sarahHome.mqttClient.subscribe(mqttHeatingControlTopic);
   sarahHome.mqttClient.subscribe(mqttWaterControlTopic);
   sarahHome.mqttClient.setCallback(mqttCallback);
