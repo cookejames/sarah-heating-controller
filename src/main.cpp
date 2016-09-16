@@ -1,4 +1,4 @@
-#define VERSION "2"
+#define VERSION "2.6"
 #include "SarahHome.h"
 #define HEATING_PIN 4
 #define WATER_PIN  5
@@ -58,8 +58,8 @@ void setup()
   sprintf(mqttWaterControlTopic, mqttControlTopicFormat, sarahHome.getNodeId().c_str(), "water");
   sprintf(mqttHeatingStatusTopic, mqttStatusTopicFormat, sarahHome.getNodeId().c_str(), "heating");
   sprintf(mqttWaterStatusTopic, mqttStatusTopicFormat, sarahHome.getNodeId().c_str(), "water");
-  sarahHome.mqttClient.subscribe(mqttHeatingControlTopic);
-  sarahHome.mqttClient.subscribe(mqttWaterControlTopic);
+  sarahHome.subscribe(mqttHeatingControlTopic);
+  sarahHome.subscribe(mqttWaterControlTopic);
   sarahHome.mqttClient.setCallback(mqttCallback);
 }
 
