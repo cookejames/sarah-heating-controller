@@ -1,4 +1,4 @@
-#define VERSION "2.6"
+#define VERSION "4"
 #include "SarahHome.h"
 #define HEATING_PIN 4
 #define WATER_PIN  5
